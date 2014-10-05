@@ -4,6 +4,7 @@ import me.gann.ranking.constants.CollegeFootballTeam;
 import me.gann.ranking.constants.GameSite;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -71,7 +72,7 @@ public class Team {
      * @param opponent - name of opponent
      * @return true if name is the same as object called on, false otherwise
      */
-    public boolean addAll(String name, int points, String opponent, int pointsAllowed, GameSite home) {
+    public boolean addAll(String name, int points, String opponent, int pointsAllowed, GameSite home, Date date) {
 
         this.name = name;
 
@@ -83,7 +84,7 @@ public class Team {
         this.pointsAllowed = this.pointsAllowed + pointsAllowed;
         ++gamesPlayed;
         games.add(new Game(CollegeFootballTeam.getTeamByLocation(name), CollegeFootballTeam.getTeamByLocation(opponent),
-                points, pointsAllowed, home));
+                points, pointsAllowed, home, date));
 
         return name.equalsIgnoreCase(this.name);
     }

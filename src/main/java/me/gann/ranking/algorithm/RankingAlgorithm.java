@@ -16,7 +16,7 @@ import java.util.*;
 public class RankingAlgorithm {
 
 
-    private static final int maxIterations = 10;
+    private static final int maxIterations = 1000000;
     private static int iterations = 0;
     private static boolean exitFlag = false;
 
@@ -46,6 +46,8 @@ public class RankingAlgorithm {
             rankingValues.put(team, 1.0);
         }
 
+        rankingValues.put(CollegeFootballTeam.OTHER, 0.0);
+
         double highestRank, lowestRank;
 
         while(iterations < maxIterations && !exitFlag){
@@ -53,22 +55,25 @@ public class RankingAlgorithm {
             HashMap<CollegeFootballTeam, Double> tempRankingValues = new HashMap<>(rankingValues);
             for(CollegeFootballTeam team : teams){
                 for(Game game : teamMap.get(team).getGames()){
-                    if(teams.contains(game.getTeam())){
-                        if(game.getTeamScore() > game.getOpponentScore()){
-                             tempRankingValues.put(team, tempRankingValues.get(team) + rankingValues.get(game.getTeam()));
+                    try {
+                        if (teams.contains(game.getTeam())) {
+
+                            if (game.getTeamScore() > game.getOpponentScore()) {
+                                tempRankingValues.put(team, tempRankingValues.get(team) + rankingValues.get(game.getOpponent()));
+                            } else if (game.getTeamScore() < game.getOpponentScore()) {
+                                tempRankingValues.put(team, tempRankingValues.get(team) - (1.0 - rankingValues.get(game.getOpponent())));
+                            }
+                        } else {
+                            tempRankingValues.put(team, 0.);
                         }
-                        else if(game.getTeamScore() < game.getOpponentScore()){
-                            tempRankingValues.put(team, tempRankingValues.get(team) - (1.0 - rankingValues.get(game.getTeam())));
-                        }
-                    }
-                    else{
-                        tempRankingValues.put(team, 0.);
+                    } catch ( Exception e ) {
+                        System.out.println("Problem calculating game " + game.getTeam().getNickname() + " vs " + game.getOpponent().getNickname());
                     }
                 }
-                if(tempRankingValues.get(team) > highestRank){
+                if(tempRankingValues.get(team) >= highestRank){
                     highestRank = tempRankingValues.get(team);
                 }
-                if(tempRankingValues.get(team) < lowestRank){
+                if(tempRankingValues.get(team) <= lowestRank){
                     lowestRank = tempRankingValues.get(team);
                 }
             }
@@ -79,6 +84,9 @@ public class RankingAlgorithm {
                 tempRankingValues.put(team, tempRankingValues.get(team) + Math.abs(lowestRank)); // value will be skewed to {0-1}
                 rankingValues.put(team, (tempRankingValues.get(team) / highestRank));
             }
+
+            ++iterations;
+//            System.out.println(iterations);
         }
 
         for(CollegeFootballTeam team : teams){
@@ -101,6 +109,7 @@ public class RankingAlgorithm {
         for(CollegeFootballTeam team : teams){
             teamMap.get(team).setRanking(rankingValues.get(team));
         }
+
 
     }
 

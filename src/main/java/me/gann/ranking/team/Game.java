@@ -17,7 +17,7 @@ public class Game {
     public int opponentScore;
     public GameSite site;
 
-    public Game(CollegeFootballTeam team, CollegeFootballTeam opponent, int teamScore, int opponentScore, GameSite home) {
+    public Game(CollegeFootballTeam team, CollegeFootballTeam opponent, int teamScore, int opponentScore, GameSite home, Date date) {
         this.team = team;
         this.opponent = opponent;
         this.teamScore = teamScore;
@@ -63,5 +63,13 @@ public class Game {
 
     public void setSite(GameSite site) {
         this.site = site;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 }

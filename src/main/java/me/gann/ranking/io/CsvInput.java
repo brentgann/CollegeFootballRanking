@@ -15,6 +15,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -76,29 +77,36 @@ public class CsvInput {
      */
     private static void readBoxScoreIn(List<String[]> lineEntries) throws CsvFormatingException, IOException, ParseException {
 
+
         List<String> scoreDate = new ArrayList<>();
         Date date = new Date();
         GameSite site;
 
         for (String[] line : lineEntries) {
 
-            for(int i=0; i<line.length; ++i){
-                line[i] = line[i].trim();
+            try {
+                for (int i = 0; i < line.length; ++i) {
+                    line[i] = line[i].trim();
+                }
+
+                if (line[0].trim().equalsIgnoreCase("Date")) {
+                    String d = line[1];
+                    DateFormat formatter = new SimpleDateFormat("MM/dd/yy");
+                    date = (Date) formatter.parse(d);
+                    continue;
+                }
+
+
+                Team a = TeamMap.getTeamForYearAndName(date.getYear() + 1900, line[0]);
+                Team b = TeamMap.getTeamForYearAndName(date.getYear() + 1900, line[2]);
+
+                a.addAll(line[0], Integer.parseInt(line[1].trim()), line[2], Integer.parseInt(line[3].trim()), GameSite.NEUTRAL, date);
+                b.addAll(line[2], Integer.parseInt(line[3].trim()), line[0], Integer.parseInt(line[1].trim()), GameSite.NEUTRAL, date);
+
+            } catch (Exception e){
+                System.out.println("Problem Reading In:\n" + Arrays.toString(line));
+                throw new RuntimeException();
             }
-
-            if (line[0].trim().equalsIgnoreCase("Date")){
-                String d = line[1];
-                DateFormat formatter = new SimpleDateFormat("MM/dd/yy");
-                date = (Date)formatter.parse(d);
-                continue;
-            }
-
-
-            Team a = TeamMap.getTeamForYearAndName(date.getYear() + 1900, line[0]);
-            Team b = TeamMap.getTeamForYearAndName(date.getYear() + 1900, line[2]);
-
-            a.addAll(line[0], Integer.parseInt(line[1].trim()), line[2], Integer.parseInt(line[3].trim()), GameSite.NEUTRAL);
-            b.addAll(line[2], Integer.parseInt(line[3].trim()), line[0], Integer.parseInt(line[1].trim()), GameSite.NEUTRAL);
 
         }
 
